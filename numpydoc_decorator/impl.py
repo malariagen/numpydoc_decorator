@@ -160,8 +160,8 @@ def humanize_type(t):
         x = t_args[0]
         return humanize_type(x)
 
-    elif t_orig == Union and t_args:
-        # special handling for union types
+    elif t_orig in (Union, _types.UnionType) and t_args:
+        # special handling for union types, including PEP 604 unions (X | Y)
         return " or ".join([humanize_type(x) for x in t_args])
 
     elif t_orig == Optional and t_args:
@@ -407,7 +407,11 @@ def unpack_optional(t):
     t_args = typing_get_args(t)
     if t_orig == Optional:
         return t_args[0]
-    if t_orig == Union and len(t_args) == 2 and t_args[1] == NoneType:
+    if (
+        t_orig in (Union, _types.UnionType)
+        and len(t_args) == 2
+        and t_args[1] == NoneType
+    ):
         # compatibility for PY37
         return t_args[0]
     return t

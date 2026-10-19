@@ -359,6 +359,40 @@ def test_parameters_typed():
     compare(foo.__annotations__["lumberjack_song"], Optional[int])
 
 
+def test_parameters_pep604_unions():
+    @doc(
+        summary="A function with PEP 604 union type hints.",
+        parameters=dict(
+            bar="This is very bar.",
+            baz="This is totally baz.",
+        ),
+        returns="Maybe an int.",
+    )
+    def foo(bar: int | None, baz: list[int] | str = "spam") -> int | None:
+        pass
+
+    expected = cleandoc(
+        """
+    A function with PEP 604 union type hints.
+
+    Parameters
+    ----------
+    bar : int or None
+        This is very bar.
+    baz : list of int or str, optional, default: 'spam'
+        This is totally baz.
+
+    Returns
+    -------
+    int or None
+        Maybe an int.
+    """
+    )
+    actual = getdoc(foo)
+    compare(actual, expected)
+    validate(foo)
+
+
 def test_parameters_all_annotated():
     # Support use of Annotated to keep type information and
     # documentation together, assuming second argument provides
